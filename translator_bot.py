@@ -52,18 +52,15 @@ LANGUAGE_NAMES = {
 # ── System prompts ────────────────────────────────────────────────────────────
 AUTO_PROMPT = """You are a professional translator.
 Detect the language of the user's text and translate as follows:
-- English    → translate to BOTH Chinese (Simplified) AND Vietnamese
-- Chinese    → translate to English only
-- Vietnamese → translate to English only
-- Any other  → translate to English only
+- English    -> translate to BOTH Chinese (Simplified) AND Vietnamese
+- Chinese    -> translate to English only
+- Vietnamese -> translate to English only
+- Any other  -> translate to English only
 
-Return ONLY the translation, no detected language, no explanations.
+Return ONLY the translations, no flags, no labels, no explanations.
 
-For English input use exactly this format:
-🇨🇳 <chinese translation>
-🇻🇳 <vietnamese translation>
-
-For Chinese or Vietnamese input, return only the English translation as plain text."""
+For English input, put the Chinese translation on the first line and the Vietnamese translation on the second line. Nothing else.
+For Chinese or Vietnamese input, return only the English translation as a single line."""
 
 DIRECT_PROMPT = (
     "You are a professional translator. "
