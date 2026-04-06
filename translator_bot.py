@@ -159,13 +159,50 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
     text = update.message.text.strip()
 
     if not text:
-        await update.message.reply_text("⚠️ Please send some text.")
+        await update.message.reply_text("Please send some text.")
         return
 
     await context.bot.send_chat_action(update.effective_chat.id, "typing")
 
-    result = translate(text, mode)
-    await update.message.reply_text(result)
+    if mode == "auto":
+        # Detect language
+        detect_prompt = "Reply with ONLY one word — the language name of this text: " + text
+        detected = translate(detect_prompt, "en_zh")  # dummy mode, we override below
+        # Use a dedicated detection call
+        try:
+            det_resp = groq_client.chat.completions.create(
+                model="llama-3.3-70b-versatile",
+                messages=[
+                    {"role": "system", "content": "You detect languages. Reply with ONLY the language name in English. One word only. Example: English, Chinese, Vietnamese."},
+                    {"role": "user", "content": text},
+                ],
+                temperature=0,
+                max_tokens=10,
+            )
+            detected_lang = det_resp.choices[0].message.content.strip().lower()
+        except:
+            detected_lang = "unknown"
+
+        if "english" in detected_lang:
+            # Send Chinese first, then Vietnamese as separate messages
+            zh = translate(text, "en_zh")
+            await update.message.reply_text(zh)
+            await context.bot.send_chat_action(update.effective_chat.id, "typing")
+            vi = translate(text, "en_vi")
+            await update.message.reply_text(vi)
+        elif "chinese" in detected_lang or "mandarin" in detected_lang:
+            result = translate(text, "zh_en")
+            await update.message.reply_text(result)
+        elif "vietnamese" in detected_lang:
+            result = translate(text, "vi_en")
+            await update.message.reply_text(result)
+        else:
+            # Fallback: translate to English
+            result = translate(text, "zh_en")
+            await update.message.reply_text(result)
+    else:
+        result = translate(text, mode)
+        await update.message.reply_text(result)
 
 
 async def error_handler(update: object, context: ContextTypes.DEFAULT_TYPE) -> None:
