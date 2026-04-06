@@ -85,7 +85,7 @@ def translate(text: str, mode: str) -> str:
             system = DIRECT_PROMPT.format(source=src, target=tgt)
 
         response = groq_client.chat.completions.create(
-            model="llama3-70b-8192",
+            model="llama-3.3-70b-versatile",
             messages=[
                 {"role": "system", "content": system},
                 {"role": "user",   "content": text},
