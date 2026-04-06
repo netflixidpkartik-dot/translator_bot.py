@@ -57,16 +57,13 @@ Detect the language of the user's text and translate as follows:
 - Vietnamese → translate to English only
 - Any other  → translate to English only
 
-Reply in this EXACT format, no extra text:
-🔍 Detected: <language name>
+Return ONLY the translation, no detected language, no explanations.
 
-<translation(s)>
+For English input use exactly this format:
+🇨🇳 <chinese translation>
+🇻🇳 <vietnamese translation>
 
-For English input use:
-🔍 Detected: English
-
-🇨🇳 Chinese: <translation>
-🇻🇳 Vietnamese: <translation>"""
+For Chinese or Vietnamese input, return only the English translation as plain text."""
 
 DIRECT_PROMPT = (
     "You are a professional translator. "
@@ -171,7 +168,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
     await context.bot.send_chat_action(update.effective_chat.id, "typing")
 
     result = translate(text, mode)
-    await update.message.reply_text(f"{MODES[mode]}\n\n{result}")
+    await update.message.reply_text(result)
 
 
 async def error_handler(update: object, context: ContextTypes.DEFAULT_TYPE) -> None:
